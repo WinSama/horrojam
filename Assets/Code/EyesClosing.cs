@@ -3,58 +3,40 @@ using UnityEngine.UI;
 public class EyesClosing : MonoBehaviour
 {
     [Header("Eyes")]
-    public GameObject RightEye;
-    public GameObject LeftEye;
-    public GameObject Eyes;
+    public GameObject EyesOff;
 
-    
-    bool isRight = false;
-    bool isLeft = false;
+    public static EyesClosing Instance;
+
+    private void Awake()
+    {
+        Instance = this;
+    }
 
     void Start()
     {
-        RightEye.SetActive(false);
-        LeftEye.SetActive(false);
-        Eyes.SetActive(false);
+        EyesOff.SetActive(false);
+        
     }
 
 
     void Update()
     {
-
-        HoldKey();
-
+        CloseYourEyes();
     }
 
-    public void HoldKey()
+    public void CloseYourEyes()
     {
-        // ตรวจว่ากดปุ่มไหนอยู่ แล้วเปิดเฉพาะอันนั้น
-        if (Input.GetMouseButton(0))
+        if (Input.GetMouseButton(0) || Input.GetMouseButton(1)) // คลิกซ้าย
         {
-            LeftEye.SetActive(true);
-            RightEye.SetActive(false);
-            Eyes.SetActive(false);
-        }
-        else if (Input.GetMouseButton(1))
-        {
-            RightEye.SetActive(true);
-            LeftEye.SetActive(false);
-            Eyes.SetActive(false);
-        }
-        else if (Input.GetMouseButton(2))
-        {
-            Eyes.SetActive(true);
-            LeftEye.SetActive(false);
-            RightEye.SetActive(false);
+
+            EyesOff.SetActive(true);
+
         }
         else
         {
-            // ถ้าไม่กดอะไรเลย → ปิดทั้งหมด
-            RightEye.SetActive(false);
-            LeftEye.SetActive(false);
-            Eyes.SetActive(false);
+            EyesOff.SetActive(false);
         }
-
-
     }
+
+
 }
