@@ -20,7 +20,8 @@ public class SequentRandomEvent : MonoBehaviour
         }
         if (Input.GetKeyDown(KeyCode.Alpha2))
         {
-
+            Debug.Log("Event Two starts");
+            EventTwo.Instance.StartEventTwo();
         }
     }
 }

@@ -4824,13 +4824,11 @@ MonoBehaviour:
   - {fileID: 1107963522}
   - {fileID: 1624613746}
   - {fileID: 393966577}
-  AudioS: {fileID: 1957043040}
-  lightsound: {fileID: 8300000, guid: 053c6e65397781b49973b2c5042b8e93, type: 3}
+  AudioS: {fileID: 0}
+  lightsound: {fileID: 0}
   blinkCount: 5
-  minShort: 0.1
-  maxShort: 0.4
-  minInterval: 0.05
-  maxInterval: 0.5
+  minInterval: 0.2
+  maxInterval: 1
 --- !u!1001 &1962184539
 PrefabInstance:
   m_ObjectHideFlags: 0
