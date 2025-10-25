@@ -2,27 +2,22 @@ using UnityEngine;
 
 public class Camera : MonoBehaviour
 {
-
-   [SerializeField] public static float mouseSensitivity = 50f;
-
-    float yaw = 180f;   // หมุนซ้าย-ขวา (แกน Y)
-    float pitch = 16f;
-    [SerializeField] float LimitLeftX = 120f; // X min
-    [SerializeField] float LimitRightX = 240f; // X max
+    public CameraData Data;
     void Start()
     {
+        Data.Cam = GetComponent<Camera>();
         Cursor.lockState = CursorLockMode.Locked; // ล็อกเมาส์ไว้กลางจอ
     }
 
     void Update()
     {
-        float mouseX = Input.GetAxis("Mouse X") * mouseSensitivity * Time.deltaTime;
-        float mouseY = Input.GetAxis("Mouse Y") * mouseSensitivity * Time.deltaTime;
+        float mouseX = Input.GetAxis("Mouse X") * Data.mouseSensitivity * Time.deltaTime;
+        float mouseY = Input.GetAxis("Mouse Y") * Data.mouseSensitivity * Time.deltaTime;
         
-        yaw += mouseX;
-        yaw = Mathf.Clamp(yaw, LimitLeftX, LimitRightX);  
+        Data.yaw += mouseX;
+        Data.yaw = Mathf.Clamp(Data.yaw, Data.LimitLeftX, Data.LimitRightX);  
 
-        transform.rotation = Quaternion.Euler(pitch,yaw,0); // หมุนกล้องอิสระ
+        transform.rotation = Quaternion.Euler(Data.pitch,Data.yaw,0); // หมุนกล้องอิสระ
     }
 
 }
