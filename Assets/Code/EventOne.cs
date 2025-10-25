@@ -3,11 +3,19 @@ using System.Collections;
 using Unity.VisualScripting;
 public class EventOne : MonoBehaviour
 {
+    public static EventOne Instance; //Used in Event
+
+    private void Awake()
+    {
+        Instance = this;
+    }
+
     [Header("Guard Data")]
     public Transform guardpos;
     public Transform guardtarget;
     public GameObject GuardPrefeb;
     private GameObject guard;
+    private bool IsEventOne = false;
 
     [Header("Sound")]
     public AudioClip GuardPass;
@@ -15,19 +23,22 @@ public class EventOne : MonoBehaviour
     [Header ("Stats")]
    
     public float movespeed;
-    
 
-    void Start()
+    public void GuardEvent() //Create guard and 
     {
+
         guard = Instantiate(GuardPrefeb, guardpos.position, guardpos.rotation);
-        StartCoroutine(WaitAGuard(0.5f));
-        
+        IsEventOne = true;
+        StartCoroutine(WaitAGuard(0.8f));
+
     }
 
-    void Update()
+
+    private void Update()
     {
-        if (guard != null)
+        if (guard != null && IsEventOne) //GuardMove
         {
+            
             guard.transform.position = Vector3.Lerp(
                 guard.transform.position,
                 guardtarget.position,
@@ -43,6 +54,7 @@ public class EventOne : MonoBehaviour
     {
         yield return new WaitForSeconds(sec);
         sound.PlayOneShot(GuardPass);
+        guard.SetActive(false);
     }
 
 

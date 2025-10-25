@@ -3,6 +3,8 @@ using UnityEngine;
 public class SequentRandomEvent : MonoBehaviour
 {
     
+    
+    
     void Start()
     {
         
@@ -11,6 +13,14 @@ public class SequentRandomEvent : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        
+        if (Input.GetKeyDown(KeyCode.Alpha1)) //startEventOne
+        {
+            Debug.Log("Event One starts");
+            EventOne.Instance.GuardEvent();
+        }
+        if (Input.GetKeyDown(KeyCode.Alpha2))
+        {
+
+        }
     }
 }
