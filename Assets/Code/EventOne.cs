@@ -1,6 +1,7 @@
 ﻿using UnityEngine;
 using System.Collections;
 using Unity.VisualScripting;
+using JetBrains.Annotations;
 public class EventOne : MonoBehaviour
 {
     public static EventOne Instance; //Used in Event
@@ -9,23 +10,30 @@ public class EventOne : MonoBehaviour
     {
         Instance = this;
     }
-    [Header("Timer")]
+    [Header("Checklist")]
     private float StartTime; // count times
     private bool isCheckingRespone; // true current time
     private bool isResponsed; // if player Eyesoff true / no respone
-    
+    private bool IstargetPos = false;
+    private bool hasLoggedResult = false;
+
+
     [Header("Guard Data")]
     public Transform guardpos;
     public Transform guardtarget;
     public GameObject GuardPrefeb;
     private GameObject guard;
     private bool IsEventOne = false;
+    public Transform guardfailPos;
+    private GameObject guardFail;
 
     [Header("Sound")]
     public AudioClip GuardPass;
     public AudioSource sound;
-    [Header ("Stats")]
-   
+    public AudioClip Mobcleaning;
+    public AudioClip GuardComing;
+    [Header("Stats")]
+
     public float movespeed;
 
     public void GuardEvent() //Create guard and 
@@ -34,44 +42,14 @@ public class EventOne : MonoBehaviour
         guard = Instantiate(GuardPrefeb, guardpos.position, guardpos.rotation);
         IsEventOne = true;
         StartCoroutine(WaitAGuard(0.7f));
-    
+
     }
 
 
     private void Update()
     {
-
         GuardMove();
-        if (isCheckingRespone && !isResponsed)
-        {
-            float timeSinceSound = Time.time - StartTime;
-
-            // ✅ ถ้าหลับตาทัน → pass
-            if (EyesClosing.Instance != null && EyesClosing.Instance.EyesOff.activeSelf)
-            {
-                if (timeSinceSound <= 4f)
-                {
-                    Debug.Log("pass");
-                }
-                else
-                {
-                    Debug.Log("fail");
-                }
-
-                isResponsed = true;
-                isCheckingRespone = false;
-            }
-
-            // ✅ ถ้าเกินเวลาแล้วไม่หลับตา → fail อัตโนมัติ
-            else if (timeSinceSound > 4f)
-            {
-                Debug.Log("fail");
-                isResponsed = true;
-                isCheckingRespone = false;
-            }
-        }
-
-
+        CheckToPassEvent();
 
     }
 
@@ -79,27 +57,85 @@ public class EventOne : MonoBehaviour
     {
         yield return new WaitForSeconds(sec);
         sound.PlayOneShot(GuardPass);
-        StartTime = Time.time;
-        isCheckingRespone = true;
-        isResponsed = false;
 
-        yield return new WaitForSeconds(sec);
-        guard.SetActive(false);
+
+
     }
 
     public void GuardMove()
     {
-        if (guard != null && IsEventOne) //GuardMove
+        if (guard != null && IsEventOne && !IstargetPos)
         {
-
             guard.transform.position = Vector3.Lerp(
                 guard.transform.position,
                 guardtarget.position,
                 movespeed * Time.deltaTime
             );
 
+            float distance = Vector3.Distance(guard.transform.position, guardtarget.position);
+            if (distance < 0.1f)
+            {
+                IstargetPos = true;
+                OnGuardReachedTarget();
+                CheckToPassEvent();
+            }
         }
-        
+
+
     }
+
+
+    private void OnGuardReachedTarget()
+    {
+        //condition
+        sound.PlayOneShot(Mobcleaning);
+        Debug.Log("Start Cleaning");
+        StartTime = Time.time;
+        isCheckingRespone = true;   // ✅ เริ่มตรวจ
+        isResponsed = false;        // ✅ ยังไม่ได้ตอบ
+
+    }
+
+    private void CheckToPassEvent()
+    {
+        if (isCheckingRespone && !isResponsed && !hasLoggedResult)
+        {
+            float timeSinceStart = Time.time - StartTime;
+
+            if (EyesClosing.Instance != null && EyesClosing.Instance.EyesOff.activeSelf)
+            {
+                if (timeSinceStart <= 10f)
+                {
+                    Debug.Log("pass");
+                }
+                else
+                {
+                    Debug.Log("fail");
+                    
+                }
+
+                isResponsed = true;
+                isCheckingRespone = false;
+                hasLoggedResult = true; // ✅ ป้องกัน log ซ้ำ
+            }
+            else if (timeSinceStart > 15f)
+            {
+                Debug.Log("fail");
+                isResponsed = true;
+                isCheckingRespone = false;
+                hasLoggedResult = true; // ✅ ป้องกัน log ซ้ำ
+                FailCondition();
+            }
+        }
+
+
+    }
+
+    public void FailCondition()
+    {
+        guardFail = Instantiate(GuardPrefeb,guardfailPos.position, guardfailPos.rotation);
+        sound.PlayOneShot(GuardComing);
+    }
+
 
 }

@@ -1,5 +1,6 @@
 ﻿using UnityEngine;
 using UnityEngine.UI;
+using System.Collections;
 public class EyesClosing : MonoBehaviour
 {
     [Header("Eyes")]
@@ -21,22 +22,21 @@ public class EyesClosing : MonoBehaviour
 
     void Update()
     {
-        CloseYourEyes();
+        StartCoroutine(EyesCloseCoolDown(5f));
     }
 
-    public void CloseYourEyes()
+    
+
+    IEnumerator EyesCloseCoolDown (float sec)
     {
-        if (Input.GetMouseButton(0) || Input.GetMouseButton(1)) // คลิกซ้าย
+        if (Input.GetMouseButtonDown(0) || Input.GetMouseButtonDown(1)) // คลิกซ้าย
         {
 
             EyesOff.SetActive(true);
-
-        }
-        else
-        {
+            yield return new WaitForSeconds(sec);
             EyesOff.SetActive(false);
+
         }
+        
     }
-
-
 }
