@@ -88,6 +88,7 @@ public class EventOne : MonoBehaviour
     private void OnGuardReachedTarget()
     {
         //condition
+        guard.SetActive(false);
         sound.PlayOneShot(Mobcleaning);
         Debug.Log("Start Cleaning");
         StartTime = Time.time;

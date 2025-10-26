@@ -1,71 +1,127 @@
 ﻿using System.Security.Cryptography.X509Certificates;
 using UnityEngine;
 using System.Collections;
+using UnityEditor.Experimental.GraphView;
+using UnityEngine.InputSystem.XR;
 public class EventTwo : MonoBehaviour
 {
     public static EventTwo Instance;
+    private bool allOffTriggered = false;
 
-    private void Awake()
-    {
-        Instance = this;
-    }
+    private void Awake() => Instance = this;
 
     [Header("Light process")]
     [SerializeField] public GameObject[] Lightbulb;
-  
 
     [Header("Sound")]
     [SerializeField] public AudioSource AudioS;
     [SerializeField] public AudioClip lightsound;
+    [SerializeField] public AudioClip finalSound;
 
     [Header("Blink Settings")]
-    [SerializeField] private int blinkCount = 5;         // จำนวนครั้งที่กระพริบ
-    [SerializeField] private float minShort = 0.1f;
-    [SerializeField] private float maxShort = 1.1f;
+    [SerializeField] private int blinkCount = 10;
+    [SerializeField] private float minInterval = 0.2f;
+    [SerializeField] private float maxInterval = 0.9f;
 
-    [SerializeField] private float minInterval = 0.2f;   // เวลาต่ำสุดระหว่างกระพริบ
-    [SerializeField] private float maxInterval = 0.9f;     // เวลาสูงสุดระหว่างกระพริบ
-
-
-    private void Start()
-    {
+    [Header("Timer")]
+    private float eventStartTime;
+    [SerializeField] private float eventDuration = 8f; // ระยะเวลา event โดยรวม
 
 
-    }
 
 
     public void StartEventTwo()
     {
-        foreach (GameObject bulb in Lightbulb) //Blink all bulb but  Random make this not the same times
+        allOffTriggered = false;
+        eventStartTime = Time.time;
+        StartCoroutine(ConditionalEvent());
+
+        foreach (GameObject bulb in Lightbulb)
         {
-
-            StartCoroutine(blinkSiglebulb(bulb));
-
+            StartCoroutine(BlinkAndCheckResponse(bulb));
         }
+
     }
-    
-    private IEnumerator blinkSiglebulb(GameObject bulb)
+
+    private IEnumerator BlinkAndCheckResponse(GameObject bulb)
     {
-        for (int i = 0; i < blinkCount; i++) //Do this 5 times  
+        // Run sound and check null
+        if (lightsound != null && AudioS != null)
         {
-            bulb.SetActive(!bulb.activeSelf);
-            if (lightsound != null && AudioS != null)
+            AudioS.clip = lightsound;
+            AudioS.loop = false;
+            AudioS.Play();
+        }
+
+        // ✅ Blinking
+        for (int i = 0; i < blinkCount; i++)
+        {
+            
+            if (allOffTriggered)
             {
-                AudioS.PlayOneShot(lightsound);
+                AudioS.Stop(); // ✅ หยุดเสียงทันทีถ้า fail แล้ว
+                yield break;
             }
 
-            float bulbrandom = Random.Range(minInterval, maxInterval); //Random blinktime to no sync
-            float Soundrandom = Random.Range(minInterval, maxInterval);
-            yield return new WaitForSeconds(bulbrandom);
-            yield return new WaitForSeconds(Soundrandom);
+            bulb.SetActive(!bulb.activeSelf);
+            float wait = Random.Range(minInterval, maxInterval);
+            yield return new WaitForSeconds(wait);
+            
+        }
 
+        AudioS.Stop(); // ✅ เพิ่มตรงนี้เพื่อหยุดเสียงเมื่อกระพริบจบ
+
+
+
+    }
+
+    private IEnumerator ConditionalEvent()
+    {
+        while (Time.time - eventStartTime < eventDuration)
+        {
+            if (EyesClosing.Instance != null && EyesClosing.Instance.IsHolding())
+            {
+                float holdTime = EyesClosing.Instance.GetCurrentHoldTime();
+                if (!allOffTriggered && holdTime > 2f)
+                {
+                    allOffTriggered = true;
+                    TurnOffAllLight();
+                    Debug.Log("Fail ❌");
+                    yield break;
+                }
+            }
+
+            yield return null;
+        }
+
+        // ✅ ถ้าออกจาก loop โดยไม่ fail → ถือว่าผ่าน
+        if (!allOffTriggered)
+        {
+            TurnOnAllLight();
+            Debug.Log("Pass ✅");
         }
 
 
-
-        bulb.SetActive(true);
     }
-    
-    
 
+
+    public void TurnOffAllLight()
+    {
+        foreach (GameObject bulb in Lightbulb)
+        {
+            bulb?.SetActive(false);
+        }
+
+        
+    }
+
+    public void TurnOnAllLight()
+    {
+        foreach (GameObject bulb in Lightbulb)
+        { 
+        bulb?.SetActive(true);
+        }
+
+       
+    }
 }
