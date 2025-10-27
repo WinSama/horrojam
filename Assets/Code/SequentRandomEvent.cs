@@ -2,12 +2,12 @@ using UnityEngine;
 
 public class SequentRandomEvent : MonoBehaviour
 {
-    
-    
-    
+
+
+
     void Start()
     {
-        
+
     }
 
     // Update is called once per frame
@@ -28,5 +28,13 @@ public class SequentRandomEvent : MonoBehaviour
             Debug.Log("Event Three starts");
             EventThree.Instance.startEventThree();
         }
+        if (Input.GetKeyDown(KeyCode.Alpha4))
+        {
+            Debug.Log("Event Four starts");
+            EventFour.Instance.StartEventFour();
+
+        }
+
+
     }
 }
