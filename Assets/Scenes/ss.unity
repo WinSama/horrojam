@@ -5450,7 +5450,7 @@ MonoBehaviour:
   AudioS: {fileID: 1727981918}
   WindSFX: {fileID: 8300000, guid: 16c05d6dd69b05146bdab25415e7414f, type: 3}
   GhostSFX: {fileID: 8300000, guid: 310ea84c59d9ea94e92055958918ed04, type: 3}
-  FogDuration: 10
+  FogDuration: 12
   ghost: {fileID: 1863235029386139562, guid: 0927d5669555f074c80594c33c4d7542, type: 3}
   GhostPos: {fileID: 234646244}
 --- !u!1001 &1962184539
