@@ -2,6 +2,7 @@
 using System.Collections;
 using Unity.VisualScripting;
 using JetBrains.Annotations;
+using DG.Tweening;
 public class EventOne : MonoBehaviour
 {
     public static EventOne Instance; //Used in Event
@@ -36,10 +37,15 @@ public class EventOne : MonoBehaviour
 
     public float movespeed;
 
+    public GameObject doorlight;
+
+    Animator guardAnim;
+
     public void GuardEvent() //Create guard and 
     {
 
         guard = Instantiate(GuardPrefeb, guardpos.position, guardpos.rotation);
+        guardAnim = guard.GetComponentInChildren<Animator>();
         IsEventOne = true;
         StartCoroutine(WaitAGuard(0.7f));
 
@@ -48,7 +54,7 @@ public class EventOne : MonoBehaviour
 
     private void Update()
     {
-        GuardMove();
+       // GuardMove();
         CheckToPassEvent();
 
     }
@@ -56,7 +62,7 @@ public class EventOne : MonoBehaviour
     private IEnumerator WaitAGuard(float sec)
     {
         yield return new WaitForSeconds(sec);
-        sound.PlayOneShot(GuardPass);
+       // sound.PlayOneShot(GuardPass);
 
 
 
@@ -85,10 +91,17 @@ public class EventOne : MonoBehaviour
     }
 
 
-    private void OnGuardReachedTarget()
+    public void OnGuardReachedTarget()
     {
         //condition
-        guard.SetActive(false);
+        // guard.SetActive(false);
+        doorlight.SetActive(true);
+        guardAnim.SetTrigger("Goal");
+
+        DG.Tweening.Sequence mySequence = DOTween.Sequence();
+        // Add a movement tween at the beginning
+        mySequence.Append(guardAnim.transform.DORotate(new Vector3(0, -107, 0), 2));
+        mySequence.Append(guardAnim.transform.DOLocalMove(new Vector3(1.17f, -0.1641614f, 4.7f), 2));
         sound.PlayOneShot(Mobcleaning);
         Debug.Log("Start Cleaning");
         StartTime = Time.time;
@@ -108,6 +121,8 @@ public class EventOne : MonoBehaviour
                 if (timeSinceStart <= 10f)
                 {
                     Debug.Log("pass");
+                    doorlight.SetActive(false);
+                    guard.SetActive(false);
                 }
                 else
                 {
