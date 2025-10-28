@@ -102,12 +102,13 @@ public class EventOne : MonoBehaviour
         // Add a movement tween at the beginning
         mySequence.Append(guardAnim.transform.DORotate(new Vector3(0, -107, 0), 2));
         mySequence.Append(guardAnim.transform.DOLocalMove(new Vector3(1.17f, -0.1641614f, 4.7f), 2));
+        mySequence.Append(guardAnim.transform.DOLocalRotate(new Vector3(0, 140.124f, 0), 2));
         sound.PlayOneShot(Mobcleaning);
         Debug.Log("Start Cleaning");
         StartTime = Time.time;
         isCheckingRespone = true;   // ✅ เริ่มตรวจ
         isResponsed = false;        // ✅ ยังไม่ได้ตอบ
-
+      ;
     }
 
     private void CheckToPassEvent()
@@ -149,7 +150,9 @@ public class EventOne : MonoBehaviour
 
     public void FailCondition()
     {
-        guardFail = Instantiate(GuardPrefeb,guardfailPos.position, guardfailPos.rotation);
+       
+        guardAnim.SetTrigger("Walk");
+       // guardFail = Instantiate(GuardPrefeb,guardfailPos.position, guardfailPos.rotation);
         sound.PlayOneShot(GuardComing);
     }
 
