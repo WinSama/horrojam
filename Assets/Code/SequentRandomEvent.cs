@@ -39,6 +39,16 @@ public class SequentRandomEvent : MonoBehaviour
             Debug.Log("Event Five starts");
             EventFive.Instance.StartEventFive();
         }
+        if (Input.GetKeyDown(KeyCode.Alpha6))
+        {
+            Debug.Log("Event Six starts");
+            EventSix.Instance.StartEventSix();
+        }
+        if (Input.GetKeyDown(KeyCode.Alpha7))
+        {
+            Debug.Log("Event Seven Starts");
+            EventSeven.Instance.StartEventSeven();
+        }
 
     }
 }

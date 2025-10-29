@@ -8,6 +8,7 @@ using Unity.VisualScripting;
 
 
 
+
 public class EventFive : MonoBehaviour
 {
     public static EventFive Instance;
@@ -32,7 +33,8 @@ public class EventFive : MonoBehaviour
     //Bool Conditional
     private bool IsFail;
     private bool IsPass;
-    private bool CloseInThisRound;
+    private bool passThisRound = false;
+    private bool failThisRound = false;
 
     private void Awake()
     {
@@ -51,83 +53,67 @@ public class EventFive : MonoBehaviour
         float timer = 0f;
         int playCount = 0;
 
-
         while (timer < EventDuration && playCount < AudioRunTimes)
         {
             int Index = Random.Range(0, AudioPos.Length);
-            AudioSource Source = AudioPos[Index];
+            AudioSource source = AudioPos[Index];
 
-            if (Source != null && GirlSFX != null)
+            if (source != null && GirlSFX != null)
             {
-                Source.clip = GirlSFX;
-                Source.Play();
+                source.clip = GirlSFX;
+                source.Play();
 
                 if (Index == 0)
                 {
-                   
+                    bool closedInTime = false;
+                    float checkTimer = 0f;
 
-                    while (Source.isPlaying)
+                    // ✅ ตรวจแค่ช่วง 2 วินาทีแรก
+                    while (checkTimer < 3.5f)
                     {
-                        if (EyesClosing.Instance != null && EyesClosing.Instance.IsHolding()) //Close 100percent
+                        if (EyesClosing.Instance != null && EyesClosing.Instance.IsHolding())
                         {
                             float t = EyesClosing.Instance.GetCurrentHoldTime();
                             if (t > 1f && t <= 2f)
                             {
-                                CloseInThisRound = true; //Check 1 Round 1 loop
+                                closedInTime = true;
+                                break;
                             }
-                            
                         }
 
+                        checkTimer += Time.deltaTime;
                         yield return null;
                     }
 
-
-
-                    if (CloseInThisRound)
+                    // ✅ ถ้าไม่หลับตาในช่วง 1–2 วิ → Fail ทันที
+                    if (!closedInTime)
                     {
-                        IsPass = true;
-                        Debug.Log("Pass✅");
-                    }
-
-
-                    else //Not close
-                    {
-                        IsFail = true;
-                        Debug.Log("❌ Fail");
-                        GameObject Summon = Instantiate(Ghost, GhostPos.position, GhostPos.rotation);
-                        Destroy(Summon, 2);
+                        Debug.Log("❌ Fail: ไม่หลับตาในช่วงเสียง Audio[0]");
+                        GameObject summon = Instantiate(Ghost, GhostPos.position, GhostPos.rotation);
+                        Destroy(summon, 2f);
                         GhostSoundPos.PlayOneShot(GhostSound);
-                        Debug.Log("❌ EventFive: Fail");
                         yield break;
-                        
+                    }
+                    else
+                    {
+                        Debug.Log("✅ Pass: หลับตาในช่วงเสียง Audio[0]");
                     }
                 }
-
             }
+
             playCount++;
-            yield return new WaitForSeconds(DelayBetweenSounds);
             timer += DelayBetweenSounds;
-
+            yield return new WaitForSeconds(DelayBetweenSounds);
         }
 
-        //   สรุปผลหลังจบ Event
-   
-        if (IsPass)
-        {
-            Debug.Log("✅ EventFive: Pass");
-        }
-        else
-        {
-            Debug.Log("✅ EventFive: ไม่มีการสุ่ม Audio[0] หรือไม่เข้าเงื่อนไข");
-        }
-
-
+        // ✅ สรุปผลหลังจบ Event
+        Debug.Log("✅ EventFive: จบโดยไม่มี Fail");
     }
 
 
 
-}
 
+}
 
 
 
