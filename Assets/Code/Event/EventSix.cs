@@ -18,8 +18,7 @@ public class EventSix : MonoBehaviour
     [SerializeField] public float DelayBetweenSounds = 10f;
     [SerializeField] private float EventDuration = 20f; // ระยะเวลา event โดยรวม
 
-    private bool IsClose = false;
-    
+   
 
 
     public void StartEventSix()

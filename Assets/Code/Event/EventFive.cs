@@ -31,10 +31,7 @@ public class EventFive : MonoBehaviour
     [SerializeField] public float AudioRunTimes;
     [SerializeField] public float DelayBetweenSounds;
     //Bool Conditional
-    private bool IsFail;
-    private bool IsPass;
-    private bool passThisRound = false;
-    private bool failThisRound = false;
+    
 
     private void Awake()
     {
