@@ -54,6 +54,11 @@ public class SequentRandomEvent : MonoBehaviour
             Debug.Log("Event Eight Starts");
             EventEight.Instance.StartEventEight();
         }
+        if (Input.GetKeyDown(KeyCode.Alpha9))
+        {
+            Debug.Log("Event Nine Starts");
+            EventNine.Instance.StartEventNine();
+        }
 
     }
 }
