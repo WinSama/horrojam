@@ -3,7 +3,7 @@ using System.Collections;
 using Unity.VisualScripting;
 using JetBrains.Annotations;
 using DG.Tweening;
-public class EventOne : MonoBehaviour
+public class EventOne : MonoBehaviour, IEvent
 {
     public static EventOne Instance; //Used in Event
 
@@ -34,16 +34,18 @@ public class EventOne : MonoBehaviour
     public AudioClip Mobcleaning;
     public AudioClip GuardComing;
     [Header("Stats")]
-
+    bool Pass = false;
+    bool Finish = false;
     public float movespeed;
 
     public GameObject doorlight;
 
     Animator guardAnim;
 
-    public void GuardEvent() //Create guard and 
+    public void StartEvent() //Create guard and 
     {
-
+        Pass = false;
+        Finish = false;
         guard = Instantiate(GuardPrefeb, guardpos.position, guardpos.rotation);
         guardAnim = guard.GetComponentInChildren<Animator>();
         IsEventOne = true;
@@ -124,11 +126,14 @@ public class EventOne : MonoBehaviour
                     Debug.Log("pass");
                     doorlight.SetActive(false);
                     guard.SetActive(false);
+                    sound.Stop();
+                    Pass = true;
+                    Finish = true;
                 }
                 else
                 {
                     Debug.Log("fail");
-                    
+                   
                 }
 
                 isResponsed = true;
@@ -152,9 +157,16 @@ public class EventOne : MonoBehaviour
     {
        
         guardAnim.SetTrigger("Walk");
-       // guardFail = Instantiate(GuardPrefeb,guardfailPos.position, guardfailPos.rotation);
+        // guardFail = Instantiate(GuardPrefeb,guardfailPos.position, guardfailPos.rotation);
         sound.PlayOneShot(GuardComing);
+        Pass = false;
+        Finish = true;
     }
 
+
+
+    public bool IsFinished() => Finish; // ✅ เพิ่มตัวนี้
+    public bool IsPassed() => Pass;
+   public string GetName() => "Event One";
 
 }

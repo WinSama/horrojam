@@ -1,10 +1,12 @@
 ﻿using UnityEngine;
 using System.Collections;
 using System.Threading;
-public class EventEight : MonoBehaviour
+public class EventEight : MonoBehaviour, IEvent
 {
     public static EventEight Instance;
 
+    bool Pass = false;
+    bool Finish = false;
     private void Awake()
     {
         Instance = this;
@@ -23,8 +25,10 @@ public class EventEight : MonoBehaviour
     [SerializeField] public AudioSource AudioS;
     [SerializeField] public AudioClip BreathSFX;
 
-    public void StartEventEight()
+    public void StartEvent()
     {
+        Pass = false;
+        Finish = false;
         StartCoroutine(EventStart());
     }
 
@@ -45,12 +49,11 @@ public class EventEight : MonoBehaviour
             // ✅ ตรวจหลับตา → Fail ทันที
             if (EyesClosing.Instance != null && EyesClosing.Instance.IsHolding() && t >= 3)
             {
-                
-                    Debug.Log("❌ EventEight: Fail - หลับตา");
-                    EndEvent(false);
-                    yield break;
-                
-               
+
+                Debug.Log("❌ EventEight: Fail - หลับตา");
+                EndEvent(false);
+                yield break;
+
             }
 
             // ✅ ตรวจมุมกล้อง
@@ -72,14 +75,14 @@ public class EventEight : MonoBehaviour
         EndEvent(false);
 
 
-       
+
 
     }
 
     private void EndEvent(bool isPass)
     {
         if (isEnd) return;
-        isEnd  = true;
+        isEnd = true;
 
         // ✅ หยุดเสียง
         if (AudioS != null && AudioS.isPlaying)
@@ -91,15 +94,23 @@ public class EventEight : MonoBehaviour
         if (isPass)
         {
             Debug.Log("🎉 EventEight: PASS");
+            Pass = true;
+            Finish = true;
         }
         else
         {
             Debug.Log("💀 EventEight: FAIL");
             AudioS.PlayOneShot(Whisper);
+            Pass = false;
+            Finish = true;
         }
 
         // ✅ เพิ่มเติม: คืนค่า, ปิดภาพ, ปิดไฟ ฯลฯ ได้ตรงนี้
     }
 
+    public bool IsPassed() => Pass;           // คืน true ถ้าผ่าน, false ถ้า fail
+    public string GetName() => "EventEight";          // คืนชื่อของ Event
+
+    public bool IsFinished()=> Finish; // ✅ เพิ่มตัวนี้
 
 }

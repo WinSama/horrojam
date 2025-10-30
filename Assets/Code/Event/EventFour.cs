@@ -1,10 +1,11 @@
 ﻿using UnityEngine;
 using System.Collections;
-public class EventFour : MonoBehaviour
+public class EventFour : MonoBehaviour ,IEvent
 {
     public static EventFour Instance;
-
-
+    
+    bool Pass = false;  
+    bool Finish = false;
     private void Awake()
     {
         Instance = this;
@@ -22,9 +23,10 @@ public class EventFour : MonoBehaviour
     [SerializeField] public GameObject ghost;
     [SerializeField] public Transform GhostPos;
 
-    public void StartEventFour()
+    public void StartEvent()
     {
-
+        Pass = false;
+        Finish = false;
         StartCoroutine(FogDurationRoutine());
     }
 
@@ -97,6 +99,8 @@ public class EventFour : MonoBehaviour
         else if (IsPass)
         {
             Debug.Log("✅ Pass: หลับตาในช่วงที่กำหนด");
+            Pass = true;
+            Finish =true;
         }
         else
         {
@@ -112,9 +116,14 @@ public class EventFour : MonoBehaviour
         GameObject Spawn = Instantiate(ghost, GhostPos.position, GhostPos.rotation);
         AudioS.PlayOneShot(GhostSFX);
         Destroy(Spawn,3f);
-
+        Pass = false;
+        Finish = true;
 
     }
+    // เรียกเมื่อเริ่ม Event
+    public bool IsPassed() => Pass;           // คืน true ถ้าผ่าน, false ถ้า fail        // คืนชื่อของ Event
+    public string GetName() => "EventFour";
 
+    public bool IsFinished()=> Finish; // ✅ เพิ่มตัวนี้
 
 }

@@ -3,8 +3,9 @@ using UnityEngine;
 using System.Collections;
 using UnityEditor.Experimental.GraphView;
 using UnityEngine.InputSystem.XR;
-public class EventTwo : MonoBehaviour
+public class EventTwo : MonoBehaviour, IEvent
 {
+    
     public static EventTwo Instance;
     private bool allOffTriggered = false;
 
@@ -28,10 +29,12 @@ public class EventTwo : MonoBehaviour
     [SerializeField] private float eventDuration = 8f; // ระยะเวลา event โดยรวม
 
 
-
-
-    public void StartEventTwo()
+    bool Pass = false;
+    bool Finish = false;
+    public void StartEvent()
     {
+        Pass = false;
+        Finish = false;
         allOffTriggered = false;
         eventStartTime = Time.time;
         StartCoroutine(ConditionalEvent());
@@ -56,7 +59,7 @@ public class EventTwo : MonoBehaviour
         // ✅ Blinking
         for (int i = 0; i < blinkCount; i++)
         {
-            
+
             if (allOffTriggered)
             {
                 AudioS.Stop(); // ✅ หยุดเสียงทันทีถ้า fail แล้ว
@@ -66,7 +69,7 @@ public class EventTwo : MonoBehaviour
             bulb.SetActive(!bulb.activeSelf);
             float wait = Random.Range(minInterval, maxInterval);
             yield return new WaitForSeconds(wait);
-            
+
         }
 
         AudioS.Stop(); // ✅ เพิ่มตรงนี้เพื่อหยุดเสียงเมื่อกระพริบจบ
@@ -87,10 +90,12 @@ public class EventTwo : MonoBehaviour
                     allOffTriggered = true;
                     TurnOffAllLight();
                     Debug.Log("Fail ❌");
+                    Pass = false;
+                    Finish = true;  
                     yield break;
                 }
             }
-                
+
             yield return null;
         }
 
@@ -99,6 +104,8 @@ public class EventTwo : MonoBehaviour
         {
             TurnOnAllLight();
             Debug.Log("Pass ✅");
+            Pass = true;
+            Finish = true;
         }
 
 
@@ -112,16 +119,22 @@ public class EventTwo : MonoBehaviour
             bulb?.SetActive(false);
         }
 
-        
+
     }
 
     public void TurnOnAllLight()
     {
         foreach (GameObject bulb in Lightbulb)
-        { 
-        bulb?.SetActive(true);
+        {
+            bulb?.SetActive(true);
         }
 
-       
+
     }
+
+    
+   public bool IsPassed() => Pass;           // คืน true ถ้าผ่าน, false ถ้า fail
+    public string GetName() => "Event Two";          // คืนชื่อของ Event
+   public bool IsFinished()=> Finish; // ✅ เพิ่มตัวนี้
+
 }

@@ -1,7 +1,7 @@
-using UnityEngine;
+﻿using UnityEngine;
 using System.Collections;
 using Unity.VisualScripting;
-public class EventThree : MonoBehaviour
+public class EventThree : MonoBehaviour, IEvent
 {
     public static EventThree Instance;
     private void Awake()
@@ -9,6 +9,8 @@ public class EventThree : MonoBehaviour
         Instance = this;
     }
 
+    bool Pass = false;
+    bool Finish = false;
     [SerializeField] public Camera Playercam;
     [SerializeField] public Transform DoorPos;
     [Header("Audio")]
@@ -27,8 +29,10 @@ public class EventThree : MonoBehaviour
     [SerializeField] public GameObject HandPrefeb;
     [SerializeField] public Transform HandPos;
 
-    public void startEventThree()
+    public void StartEvent()
     {
+        Pass = false;
+        Finish = false;
         StartCoroutine(KnockDoorEvent());
     }
 
@@ -68,6 +72,8 @@ public class EventThree : MonoBehaviour
         else
         {
             Debug.Log("Pass");
+            Pass = true;
+            Finish = true;
         }
     }
 
@@ -77,8 +83,15 @@ public class EventThree : MonoBehaviour
         {
             GameObject SpawnHand = Instantiate(HandPrefeb, HandPos.position, HandPos.rotation);
             Destroy(SpawnHand, 2);
-            
+            Pass = false;
+            Finish = true;
         }
     }
+
+
+    
+    public bool IsPassed() => Pass;           // คืน true ถ้าผ่าน, false ถ้า fail
+    public string GetName() => "Event Three";          // คืนชื่อของ Event
+    public bool IsFinished()=> Finish; // ✅ เพิ่มตัวนี้
 
 }

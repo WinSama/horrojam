@@ -9,10 +9,11 @@ using Unity.VisualScripting;
 
 
 
-public class EventFive : MonoBehaviour
+public class EventFive : MonoBehaviour , IEvent
 {
     public static EventFive Instance;
-
+    bool Pass = false;
+    bool Finish = false;    
     //GameObject
     public GameObject Ghost;
     public Transform GhostPos;
@@ -38,9 +39,10 @@ public class EventFive : MonoBehaviour
         Instance = this;
     }
 
-    public void StartEventFive()
+    public void StartEvent()
     {
-
+        Pass = false;
+        Finish = false;
         StartCoroutine(ChecksoundEvent());
     }
 
@@ -89,7 +91,10 @@ public class EventFive : MonoBehaviour
                         GameObject summon = Instantiate(Ghost, GhostPos.position, GhostPos.rotation);
                         Destroy(summon, 2f);
                         GhostSoundPos.PlayOneShot(GhostSound);
+                        Pass = false;
+                        Finish = true;
                         yield break;
+                        
                     }
                     else
                     {
@@ -105,10 +110,14 @@ public class EventFive : MonoBehaviour
 
         // ✅ สรุปผลหลังจบ Event
         Debug.Log("✅ EventFive: จบโดยไม่มี Fail");
+        Pass = true;
+        Finish = true;
     }
 
 
-
+    public bool IsPassed() => Pass;           // คืน true ถ้าผ่าน, false ถ้า fail
+    public string GetName() => "Event Five";          // คืนชื่อของ Event
+    public bool IsFinished()=> Finish; // ✅ เพิ่มตัวนี้
 
 }
 

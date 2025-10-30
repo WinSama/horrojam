@@ -1,10 +1,15 @@
 ﻿using UnityEngine;
 using System.Collections;
 using Unity.VisualScripting;
-public class EventSeven : MonoBehaviour
+
+
+
+public class EventSeven : MonoBehaviour, IEvent
 {
     public static EventSeven Instance;
 
+    bool Pass = false;
+    bool Finish = false;
     private void Awake()
     {
         Instance = this;
@@ -12,7 +17,7 @@ public class EventSeven : MonoBehaviour
 
     [Header("Anomaly")]
     [SerializeField] public GameObject PictureAnomaly;
-    [SerializeField] public Light [] LightChanging;
+    [SerializeField] public Light[] LightChanging;
 
     [Header("Sound")]
     [SerializeField] public AudioSource Audios;
@@ -26,8 +31,10 @@ public class EventSeven : MonoBehaviour
 
     private Color[] originalLightColors;
     private bool IsClose = false;
-    public void StartEventSeven()
+    public void StartEvent()
     {
+        Pass = false;
+        Finish = false;
         StartCoroutine(HorrorStart());
     }
 
@@ -103,10 +110,13 @@ public class EventSeven : MonoBehaviour
         // ✅ สรุปผลเมื่อไม่หลับตาเลย
         Debug.Log("✅ EventSeven: Pass (ไม่หลับตาเลย)");
 
+
         // ✅ คืนค่าหลังจบ Event
         if (PictureAnomaly != null)
         {
             PictureAnomaly.SetActive(false);
+            Pass = true;
+            Finish = true;
         }
 
         for (int i = 0; i < LightChanging.Length; i++)
@@ -124,7 +134,14 @@ public class EventSeven : MonoBehaviour
     public void JumpScare()
     {
         GameObject J = Instantiate(GhostPrefab, JumpScarePos.position, JumpScarePos.rotation);
-        Destroy(J,2);
+        Destroy(J, 2);
+        Pass = false;
+        Finish = true;
     }
+
+    public bool IsPassed() => Pass;           // คืน true ถ้าผ่าน, false ถ้า fail
+    public string GetName() => "EventSeven";          // คืนชื่อของ Event
+
+    public bool IsFinished()=> Finish; // ✅ เพิ่มตัวนี้
 
 }

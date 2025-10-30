@@ -1,8 +1,10 @@
 ﻿using UnityEngine;
 using System.Collections;
 using Unity.VisualScripting;
-public class EventNine : MonoBehaviour
+public class EventNine : MonoBehaviour, IEvent
 {
+    bool Pass = false;
+    bool Finish = false;
     public static EventNine Instance;
     //--------------Game-Object-----------------
     public GameObject FireStart;
@@ -26,9 +28,11 @@ public class EventNine : MonoBehaviour
         Instance = this;
     }
 
-    public void StartEventNine()
+    public void StartEvent()
     {
         isEnded = false;
+        Pass = false;
+        Finish = false;
         StartCoroutine(BookEvent());
     }
 
@@ -80,6 +84,8 @@ public class EventNine : MonoBehaviour
         FireStart.SetActive(false);
 
         Debug.Log("✅ EventNine: PASS");
+        Pass = true;
+        Finish = true;
     }
 
     private void EndFailSequence()
@@ -114,8 +120,12 @@ public class EventNine : MonoBehaviour
         BookOpen.SetActive(false);
         FireStart.SetActive(false);
         Debug.Log("🔥 EventNine: ไฟดับแล้วหลัง Fail");
+        Pass = false;
+        Finish = true;
     }
 
+    public bool IsPassed() => Pass;           // คืน true ถ้าผ่าน, false ถ้า fail
+    public string GetName() => "EventNine";          // คืนชื่อของ Event
 
-
+    public bool IsFinished() => Finish; // ✅ เพิ่มตัวนี้
 }

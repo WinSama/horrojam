@@ -1,64 +1,144 @@
+﻿using System.Collections.Generic;
 using UnityEngine;
-
+using UnityEngine.SceneManagement;
+using UnityEngine.UI;
 public class SequentRandomEvent : MonoBehaviour
 {
+    public GameObject continuePanel; // ✅ Panel ที่มีปุ่ม
+    public Button continueButton;
+    public Button stopButton;
+
+    private bool waitingForPlayerChoice = false;
 
 
+    public List<IEvent> allEvents = new List<IEvent>();
+    private Queue<IEvent> eventQueue = new Queue<IEvent>();
+    private IEvent currentEvent = null;
+    private int completedCount = 0;
+
+    public static SequentRandomEvent Instance;
+
+    private void Awake()
+    {
+        Instance = this;
+    }
 
     void Start()
     {
+        // เตรียมลิสต์ Event ทั้งหมด
+        allEvents.Add(EventOne.Instance);
+        allEvents.Add(EventTwo.Instance);
+        allEvents.Add(EventThree.Instance);
+        allEvents.Add(EventFour.Instance);
+        allEvents.Add(EventFive.Instance);
+        allEvents.Add(EventSix.Instance);
+        allEvents.Add(EventSeven.Instance);
+        allEvents.Add(EventEight.Instance);
+        allEvents.Add(EventNine.Instance);
 
+        // สุ่มแค่ 4 Event
+        ShuffleAndSelectFour();
     }
 
-    // Update is called once per frame
     void Update()
     {
-        if (Input.GetKeyDown(KeyCode.Alpha1)) //startEventOne
-        {
-            Debug.Log("Event One starts");
-            EventOne.Instance.GuardEvent();
-        }
-        if (Input.GetKeyDown(KeyCode.Alpha2))
-        {
-            Debug.Log("Event Two starts");
-            EventTwo.Instance.StartEventTwo();
-        }
-        if (Input.GetKeyDown(KeyCode.Alpha3))
-        {
-            Debug.Log("Event Three starts");
-            EventThree.Instance.startEventThree();
-        }
-        if (Input.GetKeyDown(KeyCode.Alpha4))
-        {
-            Debug.Log("Event Four starts");
-            EventFour.Instance.StartEventFour();
+        if (waitingForPlayerChoice) return;
 
-        }
-        if (Input.GetKeyDown(KeyCode.Alpha5))
+        if (currentEvent == null)
         {
-            Debug.Log("Event Five starts");
-            EventFive.Instance.StartEventFive();
+            if (HoldKey.instance != null && HoldKey.instance.isHold)
+            {
+                TryStartNextEvent();
+            }
         }
-        if (Input.GetKeyDown(KeyCode.Alpha6))
+        else if (currentEvent.IsFinished())
         {
-            Debug.Log("Event Six starts");
-            EventSix.Instance.StartEventSix();
+            if (currentEvent.IsPassed())
+            {
+                Debug.Log("✅ Event passed");
+                currentEvent = null;
+                completedCount++;
+
+                if (completedCount < 4)
+                {
+                    ShowContinueChoice(); // ✅ แสดงปุ่มทุกครั้งหลังผ่าน (ยกเว้นรอบสุดท้าย)
+                    return;
+                }
+
+                Debug.Log("🎉 Clear Game!");
+                // เพิ่มระบบจบเกมตรงนี้ได้เลย
+            }
+            else
+            {
+                Debug.Log("❌ Event failed. Game Over!");
+                GameOver.instance.FailGame();
+                currentEvent = null;
+            }
         }
-        if (Input.GetKeyDown(KeyCode.Alpha7))
+    }
+
+
+
+
+
+
+    void TryStartNextEvent()
+    {
+        
+        if (eventQueue.Count > 0)
         {
-            Debug.Log("Event Seven Starts");
-            EventSeven.Instance.StartEventSeven();
+            currentEvent = eventQueue.Dequeue();
+            currentEvent.StartEvent();
+            Debug.Log($"Starting event: {currentEvent.GetName()}");
         }
-        if (Input.GetKeyDown(KeyCode.Alpha8))
+    }
+
+    void ShuffleAndSelectFour()
+    {
+        List<IEvent> temp = new List<IEvent>(allEvents);
+        for (int i = 0; i < 4 && temp.Count > 0; i++)
         {
-            Debug.Log("Event Eight Starts");
-            EventEight.Instance.StartEventEight();
+            int index = Random.Range(0, temp.Count);
+            eventQueue.Enqueue(temp[index]);
+            temp.RemoveAt(index);
         }
-        if (Input.GetKeyDown(KeyCode.Alpha9))
+    }
+
+
+    void ShowContinueChoice()
+    {
+        
+        waitingForPlayerChoice = true;
+        continuePanel.SetActive(true);
+        Cursor.visible = true;
+        Cursor.lockState = CursorLockMode.None;
+
+        continueButton.onClick.RemoveAllListeners();
+        stopButton.onClick.RemoveAllListeners();
+
+        continueButton.onClick.AddListener(() =>
         {
-            Debug.Log("Event Nine Starts");
-            EventNine.Instance.StartEventNine();
-        }
+            continuePanel.SetActive(false);
+            waitingForPlayerChoice = false;
+
+            Cursor.visible = false;
+            Cursor.lockState = CursorLockMode.Locked;
+
+            TryStartNextEvent();
+        });
+
+        stopButton.onClick.AddListener(() =>
+        {
+            continuePanel.SetActive(false);
+            waitingForPlayerChoice = false;
+
+            Cursor.visible = false;
+            Cursor.lockState = CursorLockMode.Locked;
+
+            SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex);
+        });
 
     }
+
+
 }

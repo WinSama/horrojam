@@ -1,7 +1,7 @@
 ﻿using UnityEngine;
 using System.Collections;
 using static Unity.VisualScripting.Member;
-public class EventSix : MonoBehaviour
+public class EventSix : MonoBehaviour , IEvent
 {
     public static EventSix Instance;
     
@@ -19,10 +19,12 @@ public class EventSix : MonoBehaviour
     [SerializeField] private float EventDuration = 20f; // ระยะเวลา event โดยรวม
 
     
-
-
-    public void StartEventSix()
+    bool Pass = false;
+    bool Finish = false;
+    public void StartEvent()
     {
+        Pass = false;
+        Finish = false;
         StartCoroutine(ConditionalEvent());
     }
 
@@ -62,18 +64,24 @@ public class EventSix : MonoBehaviour
         if (holdTimeDuringEvent > 6f)
         {
             Debug.Log("✅ EventSix: Pass");
+            Pass = true;
+            Finish = true;
         }
         else
         {
             Debug.Log("❌ EventSix: Fail");
             AudioS.PlayOneShot(GhostWhisper);
+            Pass = false;
+            Finish = true;
         }
     }
 
 
 
 
+    public bool IsPassed() => Pass;           // คืน true ถ้าผ่าน, false ถ้า fail
+    public string GetName() => "Event Five"    ;          // คืนชื่อของ Event
 
-
+    public bool IsFinished()=> Finish; // ✅ เพิ่มตัวนี้
 
 }
