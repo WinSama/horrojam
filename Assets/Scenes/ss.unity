@@ -20612,7 +20612,7 @@ MonoBehaviour:
   - {fileID: 1624613749}
   - {fileID: 393966580}
   Audios: {fileID: 443276941}
-  GlitchSFX: {fileID: 8300000, guid: e696cf6bafc0806488a3dca197537b29, type: 3}
+  GlitchSFX: {fileID: 8300000, guid: a41e308d573aefb4997da5d8c5dc6860, type: 3}
   EventDuration: 20
   JumpScarePos: {fileID: 1700581298}
   GhostPrefab: {fileID: 953035415509669433, guid: ccc990f4ba428f94e89c27da36212e8f, type: 3}

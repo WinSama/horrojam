@@ -7,6 +7,7 @@ public class SequentRandomEvent : MonoBehaviour
     public GameObject continuePanel; // ✅ Panel ที่มีปุ่ม
     public Button continueButton;
     public Button stopButton;
+    private bool isGameOver = false; // ✅ เพิ่มตัวแปรนี้
 
     private bool waitingForPlayerChoice = false;
 
@@ -25,7 +26,6 @@ public class SequentRandomEvent : MonoBehaviour
 
     void Start()
     {
-        // เตรียมลิสต์ Event ทั้งหมด
         allEvents.Add(EventOne.Instance);
         allEvents.Add(EventTwo.Instance);
         allEvents.Add(EventThree.Instance);
@@ -36,13 +36,12 @@ public class SequentRandomEvent : MonoBehaviour
         allEvents.Add(EventEight.Instance);
         allEvents.Add(EventNine.Instance);
 
-        // สุ่มแค่ 4 Event
         ShuffleAndSelectFour();
     }
 
     void Update()
     {
-        if (waitingForPlayerChoice) return;
+        if (waitingForPlayerChoice || isGameOver) return;
 
         if (currentEvent == null)
         {
@@ -61,7 +60,7 @@ public class SequentRandomEvent : MonoBehaviour
 
                 if (completedCount < 4)
                 {
-                    ShowContinueChoice(); // ✅ แสดงปุ่มทุกครั้งหลังผ่าน (ยกเว้นรอบสุดท้าย)
+                    ShowContinueChoice();
                     return;
                 }
 
@@ -71,20 +70,16 @@ public class SequentRandomEvent : MonoBehaviour
             else
             {
                 Debug.Log("❌ Event failed. Game Over!");
-                GameOver.instance.FailGame();
                 currentEvent = null;
+                isGameOver = true;
+                GameOver.instance.FailGame(); // ✅ ใช้แค่ระบบนี้
             }
         }
     }
 
 
-
-
-
-
     void TryStartNextEvent()
     {
-        
         if (eventQueue.Count > 0)
         {
             currentEvent = eventQueue.Dequeue();
@@ -104,14 +99,15 @@ public class SequentRandomEvent : MonoBehaviour
         }
     }
 
-
     void ShowContinueChoice()
     {
-        
         waitingForPlayerChoice = true;
         continuePanel.SetActive(true);
         Cursor.visible = true;
         Cursor.lockState = CursorLockMode.None;
+
+        continueButton.gameObject.SetActive(true);
+        stopButton.gameObject.SetActive(true);
 
         continueButton.onClick.RemoveAllListeners();
         stopButton.onClick.RemoveAllListeners();
@@ -131,13 +127,37 @@ public class SequentRandomEvent : MonoBehaviour
         {
             continuePanel.SetActive(false);
             waitingForPlayerChoice = false;
+            isGameOver = false; // ✅ รีเซ็ตสถานะ
 
             Cursor.visible = false;
             Cursor.lockState = CursorLockMode.Locked;
 
             SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex);
         });
+    }
 
+    void ShowLosePanel()
+    {
+        waitingForPlayerChoice = true;
+        continuePanel.SetActive(true);
+        Cursor.visible = true;
+        Cursor.lockState = CursorLockMode.None;
+
+        continueButton.gameObject.SetActive(false);
+        stopButton.gameObject.SetActive(true);
+
+        stopButton.onClick.RemoveAllListeners();
+        stopButton.onClick.AddListener(() =>
+        {
+            continuePanel.SetActive(false);
+            waitingForPlayerChoice = false;
+            isGameOver = false; // ✅ รีเซ็ตสถานะ
+
+            Cursor.visible = false;
+            Cursor.lockState = CursorLockMode.Locked;
+
+            SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex);
+        });
     }
 
 
